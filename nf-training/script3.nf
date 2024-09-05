@@ -1,3 +1,4 @@
+// Collect read files by pairs
 /*
  * pipeline input parameters
  */
@@ -15,4 +16,29 @@ log.info """\
     """
     .stripIndent()
 
+// fromFilePairs channel factory takes a glob pattern as input and returns a channel of tuples
+// Each tuple contains two items: the first is the read pair prefix and the second is a list of paths to the read files.
+// set operator equals = -> read_pairs_ch chanel
+
 read_pairs_ch = Channel.fromFilePairs(params.reads)
+// equals
+Channel 
+    .fromFilePairs(params.reads)
+    .set {read_pairs_ch}
+
+
+// Add .view() to see the content
+read_pairs_ch.view()
+
+// Creates a channel of all the files in the data/ggal directory: 
+// nextflow run script3.nf --reads 'data/ggal/*_{1,2}.fq'
+
+/*
+checkIfExists option = check if specified path contains file pairs 
+file pairs = paired-end sequencing files. generating 2 files for each sample 
+    -> 2 ends of DNA fragments, so enhancing assembly accuracy, map reads more accurately to ref genome 
+    -> identitfy insertions, deletions, rearrangements 
+*/
+Channel 
+    .fromFilePairs(params.reads, checkIfExists: true)
+    .set {read_pairs_ch}

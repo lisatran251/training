@@ -1,16 +1,22 @@
 #!/usr/bin/env nextflow
 
-params.greeting = 'Hello world!'
+// Declares a parameter greeting that is initialized with the value 'Hello world!'.
+params.greeting = 'Hello world!' 
+// Channels are the input type for processes in nf   
 greeting_ch = Channel.of(params.greeting)
 
 process SPLITLETTERS {
-    input:
+    // Input can be values (val), files of paths (path)
+    input: 
+    // In this case, it's an input value
     val x
 
     output:
+    // output files (path), name starts with 'chunk_'
     path 'chunk_*'
 
-    script:
+    script: 
+    // triple " to execute the process
     """
     #!/usr/bin/env python
     x="$x"
@@ -22,9 +28,11 @@ process SPLITLETTERS {
 
 process CONVERTTOUPPER {
     input:
+    // Input the path 
     path y
 
     output:
+    // expect output as standard output (stdout)
     stdout
 
     script:
@@ -37,7 +45,9 @@ process CONVERTTOUPPER {
 
 workflow {
     letters_ch = SPLITLETTERS(greeting_ch)
+    // flatten() splits the SPLITLETTERS output into individual files to be processed by CONVERTTOUPPER
     results_ch = CONVERTTOUPPER(letters_ch.flatten())
     results_ch.view{ it }
 }
 
+// Run script using command: nextflow run hello_py.nf
